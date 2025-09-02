@@ -1,5 +1,5 @@
-pcc
-The Python C Compiler
+# pcc
+## The Python C Compiler
 
 pcc is a **C interpreter written in Python**.  
 It takes in C source code, parses it into an abstract syntax tree (AST), performs semantic checks, and can either interpret the program directly or translate it into target code
@@ -17,7 +17,7 @@ It takes in C source code, parses it into an abstract syntax tree (AST), perform
 
 ## 📦 Project Structure
 
-
+```
 gcc/
 ├── src/
 │   ├── c_lexer.py        # tokenization
@@ -31,3 +31,4 @@ gcc/
 │   └── cli.py          # compiler CLI driver
 ├── tests/              # unit tests
 └── README.md
+```
