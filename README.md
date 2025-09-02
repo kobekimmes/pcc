@@ -1,8 +1,8 @@
-# pcc
+# 🐍 pcc
 ## The Python C Compiler
 
 pcc is a **C interpreter written in Python**.  
-It takes in C source code, parses it into an abstract syntax tree (AST), performs semantic checks, and can either interpret the program directly or translate it into target code
+It takes in C source code, parses it into an abstract syntax tree (AST) and can interpret the program directly
 
 ---
 
@@ -10,8 +10,7 @@ It takes in C source code, parses it into an abstract syntax tree (AST), perform
 
 - **Lexical Analysis** → custom lexer with token definitions for C syntax.  
 - **Parsing** → builds an Abstract Syntax Tree (AST) for C programs.  
-- **Semantic Analysis** → type checking, scoping, and environment management.  
-- **Interpreter Mode** → directly executes the AST for rapid testing.   
+- **Interpreter** → type checking, scoping, environment management and evaluation. 
 
 ---
 
@@ -21,14 +20,21 @@ It takes in C source code, parses it into an abstract syntax tree (AST), perform
 gcc/
 ├── src/
 │   ├── c_lexer.py        # tokenization
-│   ├── tokens.py       # token definitions
-│   ├── parser.py       # parsing into AST
-│   ├── ast.py          # AST node definitions
-│   ├── env.py          # scope / environment logic
-│   ├── interpreter.py  # AST interpreter
-│   ├── codegen.py      # code generation (planned)
-│   ├── errors.py       # compiler-specific exceptions
-│   └── cli.py          # compiler CLI driver
-├── tests/              # unit tests
-└── README.md
+│   ├── c_parse.py        # parsing into AST
+│   ├── c_ast.py          # AST node definitions
+│   ├── c_env.py          # scope / environment logic
+│   ├── c_interpreter.py  # AST interpreter
+│   ├── c_codegen.py      # code generation (planned)
+│   ├── c_error.py        # compiler-specific exceptions
+│   └── main.py           # entry point / driver via command-line
+├── tests/                # unit tests
+├── .gitignore
+├── pyproject.toml
+└─- README.md
 ```
+
+---
+
+## Plans
+
+1. Implement codegen to target specific IR
