@@ -1,0 +1,13 @@
+[project]
+name = "pcc"
+version = "0.0.1"
+description = "A C compiler written in C Python."
+authors = [{ name="Kobe Kimmes" }]
+dependencies = []
+
+[project.scripts]
+pcc = "src.main:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
