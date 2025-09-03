@@ -1,3 +1,7 @@
+def assert_equals(lex, msg, one, two):
+    if one != two:
+        raise Error(lex, msg)
+
 class Error(Exception):
     def __init__(self, lexer, err_msg):
         self.err_msg = err_msg
