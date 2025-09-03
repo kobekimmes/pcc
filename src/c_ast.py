@@ -198,21 +198,24 @@ class ChainExpression(Expression):
         self.add("Chain", head)
 
 class FunctionInvocation(Expression):
-    def __init__(self, arguments):
+    def __init__(self, callee, arguments):
         super().__init__(NodeType.FunctionCall)
+        self.add("Callee", callee)
         for i in range(len(arguments)):
             self.add(f"Arg{i+1}", arguments[i])
             
 class Subscript(Expression):
-    def __init__(self, index):
+    def __init__(self, locator, index):
         super().__init__(NodeType.Subscript)
+        self.add("Locator", locator)
         self.add("Index", index)
 
         
 class MemberSelection(Expression):
-    def __init__(self, member, access_type):
+    def __init__(self, access_type, obj, member):
         super().__init__(NodeType.MemberSelection, access_type)
         self.access_type = access_type
+        self.add("Object", obj)
         self.add("Member", member)
         
 
