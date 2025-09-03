@@ -163,10 +163,9 @@ class Parser:
             match matched:
                 case "." | "->":
                     self.lex.expect_any([".", "->"])
+                    # TODO: Add support for parenthensized? members
                     member = self.parseIdentifier()
-                    chain = MemberSelection(matched)
-                    chain.add("Member", member)
-                    chain.add("Object", symbol)
+                    chain = MemberSelection(matched, symbol, member)
                     symbol = chain
                 case "(":
                     self.lex.expect("(")
