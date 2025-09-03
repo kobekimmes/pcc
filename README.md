@@ -1,5 +1,5 @@
-# 🐍 pcc
-## The Python C Compiler
+# pcc
+## 🐍 The Python C Compiler
 
 pcc is a **C interpreter written in Python**.  
 It takes in C source code, parses it into an abstract syntax tree (AST) and can interpret the program directly
@@ -35,6 +35,11 @@ gcc/
 
 ---
 
-## Plans
+## 📝 Plans
 
 1. Implement codegen to target specific IR
+
+## Resources & References
+
+- [Crafting Interpreters by Robert Nystrom](https://craftinginterpreters.com)
+What a beautiful book, highly recommend!
