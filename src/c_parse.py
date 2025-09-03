@@ -1,5 +1,5 @@
-from c_lex import *
-from src.c_ast import *
+from c_lexer import *
+from c_ast import *
 from c_types import *
 
 
@@ -159,13 +159,30 @@ class Parser:
         symbol = self.parseIdentifier()
         
         while self.lex.match_any([".", "->", "[", "("]) is not None:
-            chain = self.attempt([
-                self.parseMemberSelection,
-                self.parseSubscript,
-                self.parseFunctionInvocation
-            ])
-            chain.add("Locator", symbol)
-            symbol = chain
+            matched = self.lex.match_any([".", "->", "[", "("])
+            match matched:
+                case "." | "->":
+                    self.lex.expect_any([".", "->"])
+                    member = self.parseIdentifier()
+                    chain = MemberSelection(matched)
+                    chain.add("Member", member)
+                    chain.add("Object", symbol)
+                    symbol = chain
+                case "(":
+                    self.lex.expect("(")
+                    self.lex.skip_whitespace()
+                    args = self.parseArguments()
+                    self.lex.skip_whitespace()
+                    self.lex.expect(")")
+                    func = FunctionInvocation(symbol, args)
+                    symbol = func 
+                case "[":
+                    self.lex.expect("[")
+                    index = self.parseExpression()
+                    self.lex.skip_whitespace()
+                    self.lex.expect("]")
+                    index_access = Subscript(symbol, index)
+                    symbol = index_access
             
         return symbol
     
@@ -189,7 +206,7 @@ class Parser:
     def parsePrimitive(self):
         self.lex.skip_whitespace()
         
-        match_with = self.lex.match_any(["true", "false", "'" ])
+        match_with = self.lex.match_any(["true", "false", "'"])
         
         match match_with:
             case "true" | "false":
