@@ -1,5 +1,5 @@
-import sys
-from src.c_error import *
+
+from c_error import *
 
 
 class Lexer:
@@ -9,7 +9,7 @@ class Lexer:
         self.filename = filename
 
         try:
-            self.source_code = open(filename, "r").read()
+            self.source_code = preprocess(open(filename, "r").read())
         except FileNotFoundError:
             raise ParseError(f"Unable to open {filename}")
 
@@ -192,3 +192,12 @@ def numeric(char):
 def fail_on_new_line(lexer):
     if lexer.peek() == "\n":
         raise ParseError(lexer, "Encountered EOL unexpectedly")
+    
+
+def preprocess(source_code):
+    '''
+    1. Remove comments
+    2. Inject macros
+    3. More stuff maybe
+    '''
+    return source_code
