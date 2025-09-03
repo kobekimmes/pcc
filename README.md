@@ -41,5 +41,6 @@ gcc/
 
 ## Resources & References
 
-- [Crafting Interpreters by Robert Nystrom](https://craftinginterpreters.com)
+- [Crafting Interpreters](https://craftinginterpreters.com) by Robert Nystrom  
+
 What a beautiful book, highly recommend!
