@@ -1,6 +1,8 @@
-from src import Lexer, Parser, Environment
-from c_parse import trace
-from c_ast import NodeType
+from c_lexer import *
+from c_parse import *
+from c_ast import *
+from c_env import *
+from c_error import *
 
 ONE_K = 1024
 EIGHT_K = 8 * ONE_K
@@ -14,7 +16,7 @@ class Interpreter:
         self.trace_depth = 0
         self.debug = debug
         
-        self.ast = self.parser.parseDeclaration()
+        self.ast = self.parser.parseFile()
         
         # Data & Code memory
         self.current_env = Environment(None, "Global")
@@ -42,8 +44,53 @@ class Interpreter:
         return var_info
         
     def getTruthyFalsey(self, value):
-        pass
+        match value:
+            case 0 | None | False:
+                return False
+            case _:
+                return True
+       
+       
+    def evaluateChainExpression(self, node):
         
+        chain_type = node.node_type
+        
+        match chain_type:
+            case NodeType.FunctionCall:
+                return self.evaluateFunctionCall(node)
+            case NodeType.Subscript:
+                return self.evaluateSubscript(node)
+            case NodeType.MemberSelection:
+                return self.evaluateMemberSelection(node)
+            case _:
+                raise NotImplementedError(f"Unsupported chain component: {chain_type}")
+        
+       
+    def evaluateFunctionCall(self, node):
+        
+        if node.node_type == NodeType.FunctionCall:
+            function_name = node.children["Locator"].name
+            args = [self.evaluateExpression(node.children[f"Arg{i+1}"]) for i in range(len(node.children))]
+            
+            return self.executeFunction(function_name, args)
+    
+    def evaluateSubscript(self, node):
+        
+        if node.node_type == NodeType.Subscript:
+            collection_name = node.children["Locator"].name
+            index = self.evaluateExpression(node.children["Index"])
+            
+            return self.indexLookup(collection_name, index)
+    
+    def evaluateMemberSelection(self, node):
+        
+        if node.node_type == NodeType.MemberSelection:
+            
+            locator = self.evaluateChainExpression(node.children["Locator"])
+            member = self.evaluateChainExpression(node.children["Member"])
+            
+            return self.memberLookup(locator, member)
+   
     @trace
     def evaluateExpression(self, node):
         if node:
@@ -63,12 +110,53 @@ class Interpreter:
                     return self.evaluateUnary(node)
                 case NodeType.Parenthetical:
                     return self.evaluateExpression(node.children["Group"])
+                case NodeType.ChainExpression:
+                    return self.evaluateChainExpression(node)
                 case _:
                     raise NotImplementedError(f"Unsupported expression type: {node_type}")
-            
+      
     @trace
-    def evaluateCompoundStatements(self):
+    def evaluateConditional(self, node):
+        pass
+
+    
+    @trace
+    def evaluateFunction(self, node):
+        
+        assert_equals(self.lex, "Expected function signature and body (declaration)", node.node_type, NodeType.Function)
+            
+        
+    
+    
+      
+    @trace
+    def evaluateStatment(self, node):
+        statement_type = node.node_type
+        match statement_type:
+            case NodeType.ExpressionStatement:
+                return self.evaluateExpression(node)
+            case NodeType.ConditionalStatement:
+                return self.evaluateConditional(node)
+            case NodeType.Declaration:
+                return self.evaluateDeclaration(node)
+            case NodeType.Assignment:
+                return self.evaluateAssignment(node)
+            case NodeType.Function:
+                if self.current_env.depth != 0:
+                    raise RuntimeError(self.lex, "Illegal nesting of function declarations. Function declarations only allowed at top-level")
+                return self.evaluateFunction(node)
+            case _:
+                raise RuntimeError(self.lex, "Unrecognized statement type")
+                
+    @trace
+    def evaluateCompoundStatement(self, node):
         self.newEnvironment()
+        
+        if node.node_type == NodeType.CompoundStatement:
+            for i in range(len(node.children)):
+                statement = node.children[f"Statement{i+1}"]
+                
+                self.evaluateStatement(statement)
         
     @trace
     def evaluateBooleanComparison(self, lhs, rhs, operation):
@@ -183,17 +271,19 @@ class Interpreter:
     def evalutePrimitive(self):
         pass
     
+    
     def evaluateAssignment(self, node):
         
         if node.node_type == NodeType.Assignment:
             self.current_env.update_mapping()
+            
+        raise RuntimeError(self.lex, "Expected assignment")
     
     
     @trace
     def evaluateDeclaration(self, node):
     
         if node.node_type == NodeType.Declaration:
-            print(node)
             
             for i in range(len(node.children)):
                 declaration = node.children[f"Decl{i+1}"]
@@ -203,8 +293,16 @@ class Interpreter:
                         self.declareVariable(declaration.name, node.type, None)
                     case NodeType.Assignment:
                         self.declareVariable(declaration.children["LValue"].name, node.type, self.evaluateExpression(declaration.children["RValue"]))
-                print(self.current_env)
                         
-            
-                
         if self.debug: print(self.current_env)
+        
+        
+    @trace
+    def evaluateModule(self, node):
+        if node.node_type == NodeType.TranslationUnit:
+            
+            for i in range(len(node.children)):
+                statement = node.children[f"Statement{i+1}"]
+                
+                
+            
